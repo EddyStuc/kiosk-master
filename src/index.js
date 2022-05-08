@@ -22,10 +22,6 @@ const createWindow = () => {
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools();
-
-  if (!isDev) {
-		autoUpdater.checkForUpdates();
-	};
 };
 
 // This method will be called when Electron has finished
@@ -50,6 +46,9 @@ app.on('activate', () => {
   }
 });
 
+app.on("ready", function() {
+  autoUpdater.checkForUpdatesAndNotify();
+ });
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
 autoUpdater.on("update-available", (_event, releaseNotes, releaseName) => {
