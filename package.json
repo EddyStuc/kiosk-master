@@ -1,13 +1,13 @@
 {
   "name": "kiosk-master",
   "productName": "kiosk-master",
-  "version": "1.0.2",
+  "version": "1.5.4",
   "description": "Electron Wrapper for Kiosk",
   "main": "src/index.js",
   "repository": {
-		"type": "git",
-		"url": "https://github.com/EddyStuc/kiosk-master"
-	},
+    "type": "git",
+    "url": "https://github.com/shiftkiosk/kiosk-master"
+  },
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
@@ -16,18 +16,18 @@
     "lint": "echo \"No linting configured\""
   },
   "build": {
-		"appId": "com.kiosk.master",
-		"productName": "Kiosk Master",
-		"directories": {
-			"output": "electron-build",
-			"buildResources": "build-assets"
-		},
-		"win": {
-			"publish": [
-				"github"
-			]
-		}
-	},
+    "appId": "com.kiosk.master",
+    "productName": "kiosk-master",
+    "directories": {
+      "output": "electron-build",
+      "buildResources": "build-assets"
+    },
+    "win": {
+      "publish": [
+        "github"
+      ]
+    }
+  },
   "keywords": [],
   "author": "brentfrench",
   "license": "MIT",
@@ -59,9 +59,12 @@
     }
   },
   "dependencies": {
+    "@electron/remote": "^2.0.8",
     "electron-is-dev": "^2.0.0",
+    "electron-localshortcut": "^3.2.1",
     "electron-squirrel-startup": "^1.0.0",
-    "electron-updater": "^5.0.1"
+    "electron-updater": "^5.0.1",
+    "electron-webpack": "^2.8.2"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.63",

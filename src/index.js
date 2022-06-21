@@ -1,25 +1,35 @@
 const path = require("path");
-const { app, dialog, BrowserWindow } = require("electron");
+const { app, globalShortcut, BrowserWindow } = require("electron");
 const { autoUpdater } = require("electron-updater");
 const isDev = require("electron-is-dev");
+const fs = require('fs');
+let GlobalWindow = '';
+let GlobalEnv= '';
+
+GlobalEnv = JSON.parse(fs.readFileSync('C:/Users/YUNOJ1900/Desktop/.env', 'utf8'));
 
 const createWindow = () => {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-    //kiosk: true,
-    show: true
-  });
-
-
-  setTimeout(function() {
-    //mainWindow.setKiosk(true);
-  }, 100);
+  const mainWindow = new BrowserWindow(GlobalEnv.kiosk_params);
 
   // and load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
+  mainWindow.webContents.executeJavaScript(`
+  document.getElementById("iframe").setAttribute('src', '${GlobalEnv.iframe.url}')
+`);
+
+  //register esc key to toggle kiosk mode for use with teamviewer
+  globalShortcut.register('Escape', () => {
+    return mainWindow.isKiosk() 
+        ? mainWindow.setKiosk(false) 
+        : (mainWindow.setKiosk(true),
+        setTimeout(() => {
+          mainWindow.reload()
+        }, 200));
+  });
+  
+  GlobalWindow = mainWindow;
   // Open the DevTools.
   // mainWindow.webContents.openDevTools();
 };
@@ -46,33 +56,14 @@ app.on('activate', () => {
   }
 });
 
-app.on("ready", function() {
-  autoUpdater.checkForUpdatesAndNotify();
- });
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
-autoUpdater.on("update-available", (_event, releaseNotes, releaseName) => {
-	const dialogOpts = {
-		type: 'info',
-		buttons: ['Ok'],
-		title: 'Application Update',
-		message: process.platform === 'win32' ? releaseNotes : releaseName,
-		detail: 'A new version is being downloaded.'
-	}
-	dialog.showMessageBox(dialogOpts, (response) => {
+// Electron autoupdater check for updates and then quit and install
+// when downloaded in background
+setInterval(() => {
+  autoUpdater.checkForUpdates();
+}, 60000);
 
-	});
-})
-
-autoUpdater.on("update-downloaded", (_event, releaseNotes, releaseName) => {
-	const dialogOpts = {
-		type: 'info',
-		buttons: ['Restart', 'Later'],
-		title: 'Application Update',
-		message: process.platform === 'win32' ? releaseNotes : releaseName,
-		detail: 'A new version has been downloaded. Restart the application to apply the updates.'
-	};
-	dialog.showMessageBox(dialogOpts).then((returnValue) => {
-		if (returnValue.response === 0) autoUpdater.quitAndInstall()
-	})
+autoUpdater.on("update-downloaded", () => {
+  setTimeout(() => {
+    autoUpdater.quitAndInstall()
+  }, 500)
 });
